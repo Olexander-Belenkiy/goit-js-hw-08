@@ -1,49 +1,40 @@
-// import throttle from 'lodash.throttle';
+import throttle from "lodash.throttle";
 
-// const STORAGE_KEY = 'feedback-form-state';
+const form = document.querySelector(".feedback-form");
 
-const refs = {
-  form: document.querySelector('.feedback-form'),
-  textarea: document.querySelector('.feedback-form  textarea'),
-};
+const INPUT_KEY = "feedback-form-state";
 
-refs.form.addEventListener('submit', onFormSubmit);
-// refs.textarea.addEventListener('input', throttle(onTextareaInput, 500));
-refs.textarea.addEventListener('input', onTextareaInput);
+form.addEventListener("input", throttle(onInputValues, 500));
+form.addEventListener("submit", onFormSubmit);
 
-function onTextareaInput(evt) {
-  const value = evt.target.value;
-  console.log(value);
+let formData = {};
+
+function onInputValues(e) {
+  formData = JSON.parse(localStorage.getItem(INPUT_KEY)) || {};
+
+  formData[e.target.name] = e.target.value;
+
+  localStorage.setItem(INPUT_KEY, JSON.stringify(formData));
 }
+//=============================
+restoreInputData();
 
-// let formData = {};
+function restoreInputData() {
+  const savedData = JSON.parse(localStorage.getItem(INPUT_KEY));
 
-// function onInputValues(e) {
-//   formData = JSON.parse(localStorage.getItem(INPUT_KEY)) || {};
+  if (!savedData) {
+    return;
+  }
+  form.email.value = savedData.email || "";
+  form.message.value = savedData.message || "";
+}
+//=============================
 
-//   formData[e.target.name] = e.target.value;
+function onFormSubmit(e) {
+  e.preventDefault();
 
-//   localStorage.setItem(INPUT_KEY, JSON.stringify(formData));
-// }
-// //=============================
-// restoreInputData();
+  console.log(JSON.parse(localStorage.getItem(INPUT_KEY)));
 
-// function restoreInputData() {
-//   const savedData = JSON.parse(localStorage.getItem(INPUT_KEY));
-
-//   if (!savedData) {
-//     return;
-//   }
-//   form.email.value = savedData.email || '';
-//   form.message.value = savedData.message || '';
-// }
-// //=============================
-
-// function onFormSubmit(e) {
-//   e.preventDefault();
-
-//   console.log(JSON.parse(localStorage.getItem(INPUT_KEY)));
-
-//   e.currentTarget.reset();
-//   localStorage.removeItem(INPUT_KEY);
-// }
+  e.currentTarget.reset();
+  localStorage.removeItem(INPUT_KEY);
+}
